@@ -8,15 +8,8 @@ namespace MySession
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<IMySessionStorageEngine>(services =>
-            {
-                var path = Path.Combine(services.GetRequiredService<IHostEnvironment>().ContentRootPath, "session");
-                Directory.CreateDirectory(path);
 
-                return new FileMySessionStorageEngine(path);
-             });
-
-            builder.Services.AddSingleton<IMySessionStorage, MySessionStorage>();
+            builder.Services.AddMySession();
 
             var app = builder.Build();
 

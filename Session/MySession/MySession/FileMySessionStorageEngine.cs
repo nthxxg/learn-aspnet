@@ -1,4 +1,7 @@
-﻿namespace MySession.MySession
+﻿
+using System.Threading;
+
+namespace MySession.MySession
 {
     public class FileMySessionStorageEngine : IMySessionStorageEngine
     {
@@ -15,10 +18,24 @@
             using FileStream fileStream = new FileStream(filePath, FileMode.Create);
             using StreamWriter streamWriter = new StreamWriter(fileStream);
 
-            streamWriter.Write(System.Text.Json.JsonSerializer.Serialize(_store));
+            // Use WriteAsync instead of Write
+            await streamWriter.WriteAsync(System.Text.Json.JsonSerializer.Serialize(_store));
         }
 
-    
+        public Dictionary<string, byte[]> Load(string id)
+        {
+            string filePath = Path.Combine(_directoryPath, id);
+            if (!File.Exists(filePath))
+            {
+                return [];
+            }
+
+            using FileStream fileStream = new FileStream(filePath, FileMode.Open);
+            using StreamReader streamReader = new StreamReader(fileStream);
+
+            var json = streamReader.ReadToEnd();
+            return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, byte[]>>(json) ?? [];
+        }
 
         public async Task<Dictionary<string, byte[]>> LoadAsync(string id, CancellationToken cancellationToken)
         {
@@ -35,5 +52,4 @@
             return System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, byte[]>>(json) ?? [];
         }
     }
-    
 }

@@ -9,7 +9,7 @@ namespace MySession.MySession
         {
             get
             {
-                LoadAsync(CancellationToken.None).Wait();
+                Load();
                 return true;
             }
         }
@@ -39,6 +39,18 @@ namespace MySession.MySession
                 _store[item.Key] = item.Value;
             }
         }
+
+        public void  Load()
+        {
+            _store.Clear();
+            
+            var loadedStore = engine.Load(Id);
+            foreach (var item in loadedStore)
+            {
+                _store[item.Key] = item.Value;
+            }
+        }
+
 
         public void Remove(string key)
         {
